@@ -1,7 +1,8 @@
 package org.example.model;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.example.model.velo.Velo;
 
 public class Station {
     private final int id;

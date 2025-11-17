@@ -1,25 +1,35 @@
 package org.example.model;
+import org.example.model.velo.Velo;
 
 public class Utilisateur {
-    private final int id;
-    private final String nom;
+    private String nom;
     private double solde;
+    private Velo veloActuel;
 
-    public Utilisateur(int id, String nom, double solde) {
-        this.id = id;
+    public Utilisateur(String nom, double solde) {
         this.nom = nom;
         this.solde = solde;
     }
 
-    public boolean payer(double montant) {
-        if (solde >= montant) {
-            solde -= montant;
-            return true;
+    public boolean louerVelo(Station station) {
+        Velo v = station.withdraw();
+        if (v == null) return false;
+
+        double prix = v.getPrice();
+
+        if (solde < prix) {
+            station.deposit(v); // remettre vélo
+            return false;
         }
-        return false;
+
+        solde -= prix;
+        veloActuel = v;
+        return true;
     }
 
-    public double getSolde() { return solde; }
-    public String getNom() { return nom; }
-    public int getId() { return id; }
+    public void rendreVelo(Station station) {
+        if (veloActuel != null && station.deposit(veloActuel)) {
+            veloActuel = null;
+        }
+    }
 }

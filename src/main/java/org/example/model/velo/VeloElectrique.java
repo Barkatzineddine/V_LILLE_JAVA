@@ -1,21 +1,40 @@
 package org.example.model.velo;
 
-public class VeloElectrique extends Velo{
-    private double diffPrice = 75.99;
-    private double batteryLevel = 100;
+public class VeloElectrique implements Velo{
 
-    public VeloElectrique(int id, double price, String description){
-        super(id, price, description);
+    private double batteryLevel = 100;
+    private final String id;
+    private double price;
+    private String description;
+    private boolean horsService = false;
+    private int uses = 0;
+
+    public VeloElectrique(String id, double price, String description){
+        this.id = id;
+        this.price = price;
+        this.description = description;
+    }
+
+    @Override
+    public boolean isHorsService() { return horsService; }
+
+    @Override
+    public String getId() { return id; }
+
+    @Override
+    public void incrementUsage() { 
+        uses++;
+        if (uses > 10) horsService = true;
     }
 
     @Override
     public String getDescription(){
-        return this.getDescription() + "velo electrique";
+        return this.description;
     }
 
     @Override
     public double getPrice(){
-        return this.getPrice()+this.diffPrice;
+        return this.price;
     }
     
     public double getBatteryLevel(){
@@ -25,10 +44,12 @@ public class VeloElectrique extends Velo{
     public void charge(int time){
         int i;
         for(i=0; i<=time;i++){
-            if(batteryLevel==100)
+            if(batteryLevel == 100)
                 break;
             batteryLevel=+1;
         }
     }
+
+ 
 
 }

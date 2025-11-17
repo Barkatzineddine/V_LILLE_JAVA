@@ -1,87 +1,76 @@
 package org.example.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.example.model.Station;
-import org.example.model.Velo;
+import org.example.model.observer.StationObserver;
+import org.example.model.velo.Velo;
 
-public class CentreControle {
+public class CentreControle implements StationObserver {
 
-    private final List<Station> stations;
-    private final int maxTempsSansMouvement = 2; // intervalle après lequel on redistribue
-    private final List<Integer> tempsSansMouvement; // compteur pour chaque station
+    private static CentreControle instance;
+    private Map<Station, Integer> compteurVideMap = new HashMap<>();
+    private Map<Station, Integer> compteurPleineMap = new HashMap<>();
+    private List<Station> stations;
 
-    public CentreControle(List<Station> stations) {
+    private CentreControle() {}
+
+    public static CentreControle getInstance() {
+        if (instance == null) {
+            instance = new CentreControle();
+        }
+        return instance;
+    }
+
+    @Override
+    public void notify(String message, Station station) {
+        System.out.println("[CENTRE] Notification reçue : " + message + " — Station " + station.getId());
+        // ici tu peux mettre ta logique de redistribution
+    }
+
+    public void tick(List<Station> stations) {
+    for (Station s : stations) {
+        // compteur vide
+        if (s.isEmpty()) {
+            compteurVideMap.put(s, compteurVideMap.getOrDefault(s, 0) + 1);
+        } else {
+            compteurVideMap.put(s, 0);
+        }
+
+        // compteur pleine
+        if (s.isFull()) {
+            compteurPleineMap.put(s, compteurPleineMap.getOrDefault(s, 0) + 1);
+        } else {
+            compteurPleineMap.put(s, 0);
+        }
+
+        // alerte et redistribution
+        if (compteurVideMap.get(s) >= 2 || compteurPleineMap.get(s) >= 2) {
+            redistribuer();
+        }
+    }
+}
+
+    public void enregistrerStations(List<Station> stations) {
         this.stations = stations;
-        this.tempsSansMouvement = new ArrayList<>(Collections.nCopies(stations.size(), 0));
     }
 
-    /**
-     * Notifie qu'un vélo a été retiré d'une station
-     */
-    public void notifierVeloRetire(Velo velo, Station station) {
-        incrementerTempsSansMouvement();
-        int index = stations.indexOf(station);
-        if (index >= 0) tempsSansMouvement.set(index, 0);
-    }
+    private void redistribuer() {
+            // trouver stations pleines et stations vides
+        List<Station> pleines = stations.stream().filter(Station::isFull).toList();
+        List<Station> vides = stations.stream().filter(Station::isEmpty).toList();
 
-    /**
-     * Notifie qu'un vélo a été déposé dans une station
-     */
-    public void notifierVeloDepose(Velo velo, Station station) {
-        incrementerTempsSansMouvement();
-        int index = stations.indexOf(station);
-        if (index >= 0) tempsSansMouvement.set(index, 0);
-    }
-
-    /**
-     * Incrémente le compteur de temps sans mouvement pour toutes les stations
-     */
-    private void incrementerTempsSansMouvement() {
-        for (int i = 0; i < tempsSansMouvement.size(); i++) {
-            tempsSansMouvement.set(i, tempsSansMouvement.get(i) + 1);
-        }
-        redistribuerVelosSiNecessaire();
-    }
-
-    /**
-     * Redistribue les vélos si une station est restée vide ou pleine trop longtemps
-     */
-    private void redistribuerVelosSiNecessaire() {
-        for (int i = 0; i < stations.size(); i++) {
-            Station s = stations.get(i);
-            if (tempsSansMouvement.get(i) >= maxTempsSansMouvement) {
-                if (s.estVide() || s.estPleine()) {
-                    redistribuer(s);
-                    tempsSansMouvement.set(i, 0);
-                }
+            // déplacer un vélo de chaque station pleine vers une station vide
+        for (int i = 0; i < Math.min(pleines.size(), vides.size()); i++) {
+            Station sPleine = pleines.get(i);
+            Station sVide = vides.get(i);
+            Velo v = sPleine.withdraw();
+            if (v != null) {
+                sVide.deposit(v);
+                System.out.println("[CENTRE] Vélo déplacé de " + sPleine.getId() + " vers " + sVide.getId());
             }
         }
-    }
-
-    /**
-     * Redistribution simple : déplacer un vélo d'une station non vide vers la station cible
-     */
-    private void redistribuer(Station cible) {
-        for (Station s : stations) {
-            if (!s.equals(cible) && !s.estVide() && !cible.estPleine()) {
-                Velo velo = s.retirerVelo();
-                if (velo != null) {
-                    cible.ajouterVelo(velo);
-                    System.out.println("Redistribution : Velo " + velo.getId() +
-                            " de Station " + s.getId() + " vers Station " + cible.getId());
-                    break; // déplacer un vélo à la fois
-                }
-            }
-        }
-    }
-
-    /**
-     * Retourne la liste des stations supervisées
-     */
-    public List<Station> getStations() {
-        return stations;
     }
 }

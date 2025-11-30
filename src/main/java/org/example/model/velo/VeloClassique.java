@@ -36,4 +36,11 @@ public class VeloClassique implements Velo{
     @Override
     public String getId() { return id; }
 
+    @Override
+    public void displayStatus() {
+        System.out.println("  - Vélo " + id + " : " + getDescription());
+    }
+
+
+
 }

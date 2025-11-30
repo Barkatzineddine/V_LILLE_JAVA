@@ -32,4 +32,8 @@ public class Utilisateur {
             veloActuel = null;
         }
     }
+
+    public double getSolde(){return this.solde;}
+
+    public String getNom(){return this.nom;} 
 }

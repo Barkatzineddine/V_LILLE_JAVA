@@ -50,6 +50,9 @@ public class VeloElectrique implements Velo{
         }
     }
 
- 
+    @Override
+    public void displayStatus() {
+        System.out.println("  - Vélo " + id + " : " + getDescription());
+    }
 
 }

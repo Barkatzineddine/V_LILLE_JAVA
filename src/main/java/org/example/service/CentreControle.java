@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.example.model.Station;
 import org.example.model.observer.StationObserver;
-import org.example.model.velo.Velo;
+import org.example.service.strategy.RedistributionStrategy;
 
 public class CentreControle implements StationObserver {
 
@@ -14,6 +14,7 @@ public class CentreControle implements StationObserver {
     private Map<Station, Integer> compteurVideMap = new HashMap<>();
     private Map<Station, Integer> compteurPleineMap = new HashMap<>();
     private List<Station> stations;
+    private RedistributionStrategy strategy;
 
     private CentreControle() {}
 
@@ -57,20 +58,15 @@ public class CentreControle implements StationObserver {
         this.stations = stations;
     }
 
-    private void redistribuer() {
-            // trouver stations pleines et stations vides
-        List<Station> pleines = stations.stream().filter(Station::isFull).toList();
-        List<Station> vides = stations.stream().filter(Station::isEmpty).toList();
+    public void setStrategy(RedistributionStrategy strategy) {
+    this.strategy = strategy;
+    }
 
-            // déplacer un vélo de chaque station pleine vers une station vide
-        for (int i = 0; i < Math.min(pleines.size(), vides.size()); i++) {
-            Station sPleine = pleines.get(i);
-            Station sVide = vides.get(i);
-            Velo v = sPleine.withdraw();
-            if (v != null) {
-                sVide.deposit(v);
-                System.out.println("[CENTRE] Vélo déplacé de " + sPleine.getId() + " vers " + sVide.getId());
-            }
-        }
+    private void redistribuer() {
+    if (strategy == null) {
+        System.out.println("[ERREUR] Aucune stratégie définie !");
+        return;
+    }
+    strategy.redistribute(stations);
     }
 }

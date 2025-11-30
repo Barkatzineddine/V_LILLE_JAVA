@@ -1,7 +1,9 @@
 package org.example.model.velo;
 
+import org.example.model.composite.LocationComponent;
 
-public interface  Velo {
+
+public interface Velo extends LocationComponent{
 
     double getPrice();
     String getDescription();

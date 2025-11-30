@@ -22,4 +22,9 @@ public abstract class VeloDecorator implements Velo {
 
     @Override
     public String getId() { return decoratedVelo.getId(); };
+
+    @Override
+    public void displayStatus() {
+        decoratedVelo.displayStatus();
+    }
 }

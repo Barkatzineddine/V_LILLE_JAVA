@@ -2,20 +2,21 @@ package org.example.model.composite;
 
 import java.util.List;
 
+/** Composite node representing one station for display purposes. */
 public class StationComposite implements LocationComponent {
 
-    private String id;
-    private List<LocationComponent> emplacements;
+    private final String id;
+    private final List<LocationComponent> slots;
 
-    public StationComposite(String id, List<LocationComponent> emplacements) {
+    public StationComposite(String id, List<LocationComponent> slots) {
         this.id = id;
-        this.emplacements = emplacements;
+        this.slots = slots;
     }
 
     @Override
     public void displayStatus() {
-        System.out.println("Station " + id + " :");
-        for (LocationComponent c : emplacements) {
+        System.out.println("Station " + id + ":");
+        for (LocationComponent c : slots) {
             c.displayStatus();
         }
     }

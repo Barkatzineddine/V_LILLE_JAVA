@@ -3,24 +3,27 @@ package org.example.service.strategy;
 import java.util.List;
 
 import org.example.model.Station;
-import org.example.model.velo.Velo;
+import org.example.model.bike.Bike;
 
+/**
+ * Simple strategy: move one bike from each full station to each empty station (pairwise).
+ */
 public class SimpleRedistributionStrategy implements RedistributionStrategy {
 
     @Override
     public void redistribute(List<Station> stations) {
-        List<Station> pleines = stations.stream().filter(Station::isFull).toList();
-        List<Station> vides = stations.stream().filter(Station::isEmpty).toList();
+        List<Station> full = stations.stream().filter(Station::isFull).toList();
+        List<Station> empty = stations.stream().filter(Station::isEmpty).toList();
 
-        for (int i = 0; i < Math.min(pleines.size(), vides.size()); i++) {
-            Station full = pleines.get(i);
-            Station empty = vides.get(i);
+        int k = Math.min(full.size(), empty.size());
+        for (int i = 0; i < k; i++) {
+            Station from = full.get(i);
+            Station to = empty.get(i);
 
-            Velo v = full.withdraw();
-            if (v != null) {
-                empty.deposit(v);
-                System.out.println("[STRATEGY] Simple redistribution: "
-                        + full.getId() + " -> " + empty.getId());
+            Bike b = from.withdraw();
+            if (b != null) {
+                to.deposit(b);
+                System.out.println("[STRATEGY] Simple redistribution: " + from.getId() + " -> " + to.getId());
             }
         }
     }

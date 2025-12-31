@@ -1,13 +1,13 @@
-package org.example.model.velo;
+package org.example.model.bike;
 
 import org.example.model.composite.LocationComponent;
 
 
-public interface Velo extends LocationComponent{
+public interface Bike extends LocationComponent{
 
     double getPrice();
     String getDescription();
-    boolean isHorsService();
+    boolean isOutOfService();
     void incrementUsage();
     String getId();
 }

@@ -2,9 +2,10 @@ package org.example.model.composite;
 
 import java.util.List;
 
+
 public class NetworkComposite implements LocationComponent {
 
-    private List<LocationComponent> stations;
+    private final List<LocationComponent> stations;
 
     public NetworkComposite(List<LocationComponent> stations) {
         this.stations = stations;
@@ -12,7 +13,7 @@ public class NetworkComposite implements LocationComponent {
 
     @Override
     public void displayStatus() {
-        System.out.println("=== Réseau des stations ===");
+        System.out.println("=== Station network ===");
         for (LocationComponent station : stations) {
             station.displayStatus();
         }
